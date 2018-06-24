@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+<html>
+
+<head>
+    <title>This tutorial has been put together by me (haha).</title>
+</head>
+
+<body>
+    <div>
+        <a href="/rango/">Main page</a><br />
+        <img src="{% static "images/tempo.jpg" %}" alt="Not so funny meme" />
+        <img src="{{ MEDIA_URL}}cat.jpg" />
+    </div>
+</body>
+
+</html>
