@@ -31,7 +31,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -128,4 +127,5 @@ USE_TZ = True
 STATICFILES_DIRS = [STATIC_DIR, ]
 STATIC_URL = '/static/'
 
-
+LOGIN_REDIRECT_URL = '/rango/'
+LOGIN_URL = '/rango/login/'
