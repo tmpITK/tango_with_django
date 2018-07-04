@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from rango.bing_search import run_query
+from django.shortcuts import redirect
 
 def get_server_side_cookie(request, cookie, default_val=None):
     val = request.session.get(cookie)
@@ -52,6 +54,17 @@ def show_category(request, category_name_slug):
         context_dict['pages'] = None
         context_dict['category'] = None
 
+    context_dict['query'] = category.slug
+    result_list = []
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+
+        if query:
+            result_list = run_query(query)
+            context_dict['query'] = query
+            context_dict['result_list'] = result_list
+
     return render(request, 'rango/category.html', context_dict)
 
 @login_required
@@ -97,6 +110,32 @@ def about(request):
     visitor_cookie_handler(request)
     context_dict = {'visits': request.session['visits']}
     return render(request, 'rango/about.html', context_dict)
+
+def search(request):
+    result_list = []
+    query = ''
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+        if query:
+            result_list = run_query(query)
+    return render(request, 'rango/search.html', {'query': query, 'result_list': result_list})
+
+def track_url(request):
+    page_id = None
+    if request.method == 'GET':
+        if 'page_i' in request.GET:
+            page_id = request.GET['page_i']
+    if page_id:
+        try:
+            page = Page.objects.get(id=page_id)
+            page.views = page.views + 1
+            page.save()
+            return redirect(page.url)
+        except:
+            return HttpResponse("Page id {0} not found".format(page_id))
+    print("No page_id in get string")
+    return redirect(reverse('index'))
 
 def register(request):
     registered = False

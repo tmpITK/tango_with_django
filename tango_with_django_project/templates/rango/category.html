@@ -6,19 +6,46 @@
 {% endblock %}
 
 {% block body_block %}
+
     {% if category %}
         <h1>{{ category.name }}</h1>
 
         {% if pages %}
             <ul>
                 {% for page in pages %}
-                    <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+                    <li><a href="{% url 'goto' %}?page_i={{page.id}}">{{ page.title }}</a></li>
                 {% endfor %}
             </ul>
         {% else %}
             <strong>No pages currently in this category.</strong>
         {% endif %}
         <a href="{% url 'add_page' category.slug %}">Add Page</a> <br/>
+        {% if user.is_authenticated %}
+            <div>
+                <form class="form-inline" id="user_form" method="post" action="{% url 'show_category' category.slug %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input class="form-control" type="text" size="50" name="query" value="{{ query }}" id="query" />
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="submit" value="Search">Search</button>
+                </form>    
+            </div>
+            <div>
+                {% if result_list %}
+                    <h3>Results</h3>
+                    <div class="list-group">
+                        {% for result in result_list %}
+                            <div class="list-group-item">
+                                <h4 class="list-group-item-heading">
+                                    <a href="{{ result.link }}">{{result.title}}</a>
+                                    <p class="list-group-item-text"> {{ result.summary }}</p>
+                                </h4>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     {% else %}
             The specified category does not exist!
     {% endif %}
